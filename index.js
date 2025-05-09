@@ -15,7 +15,9 @@ class CommandBase {
         mod.hook('S_LOGIN', 'event', () => { this.loaded = false; });
 
         mod.hook('S_LOAD_CLIENT_USER_SETTING', 'raw', { order: 50, filter: { fake: null } }, () => {
-            if (this.loaded)
+            const disabled = !!require("../../bin/config").loadConfig()?.nochatchannel;
+
+            if (disabled || this.loaded)
                 return;
 
             this.loaded = true;
@@ -82,7 +84,7 @@ class CommandBase {
                 if (!lastError)
                     return false;
             } else if (this.mod.settings.public_enable) {
-                const str = PUBLIC_MATCH.exec(stripOuterHTML(event.message));
+                const str = PUBLIC_MATCH.exec(stripOuterHTML(event.message).trim());
 
                 if (str) {
                     lastError = hookCommand(str[1]);
@@ -106,7 +108,7 @@ class CommandBase {
             if (!this.mod.settings.public_enable)
                 return;
 
-            const str = PUBLIC_MATCH.exec(stripOuterHTML(event.message));
+            const str = PUBLIC_MATCH.exec(stripOuterHTML(event.message).trim());
 
             if (str) {
                 lastError = hookCommand(str[1]);
